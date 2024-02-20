@@ -96,7 +96,7 @@ public:
 	}
 
 	friend ostream& operator <<(ostream& s, const DoubleLinkedList& list) {
-		typename DoubleLinkedList::Node* current = list.head;
+		Node* current = list.head;
 		while (current != nullptr) {
 			s << current->val << " ";
 			current = current->next;
