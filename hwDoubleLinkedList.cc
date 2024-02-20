@@ -18,89 +18,81 @@ public:
 	
 	// Destructor to free allocated memory
 	~DoubleLinkedList() {
-		Node* current = head;
-		while (current != nullptr) {
-			Node* next = current->next;
-			delete current;
-			current = next;
-		}
+		Node* temp;
+        	for (Node* p = head; p != nullptr; p = temp) {
+            		temp = p->next;
+            		delete p;
+        	}
 	}
 
 	void addStart(int v) {
-		Node* newNode = new Node;
-		newNode->val = v;
-		newNode->prev = nullptr;
-		newNode->next = head;
-		if (head != nullptr)
-			head->prev = newNode;
-		head = newNode;
-		if (tail == nullptr)
-			tail = head;
+		head = new Node(v, head);
+       	 	if (head->next != nullptr)
+           		head->next->prev = head;
+        	else
+            		tail = head;
+        	size++;
 	}
 
 	void addEnd(int v) {
-		Node* newNode = new Node;
-		newNode->val = v;
-		newNode->next = nullptr;
-		newNode->prev = tail;
-		if (tail != nullptr)
-			tail->next = newNode;
-		tail = newNode;
-		if (head == nullptr)
-			head = tail;
+		if (head == nullptr) {
+            		head = new Node(v);
+            		tail = head;
+        	} 
+		else {
+            		Node* newNode = new Node(v, nullptr, tail);
+            		tail->next = newNode;
+            		tail = newNode;
+        	}
+        	size++;
 	}
 
 	void removeStart() {
-		if (head != nullptr) {
-			Node* temp = head;
-			head = head->next;
-			if (head != nullptr)
-				head->prev = nullptr;
-			delete temp;
-			if (head == nullptr)
-				tail = nullptr;
-		}
+		Node* temp = head;
+        	int v = temp->val;
+        	head = head->next;
+        	if (head != nullptr)
+            		head->prev = nullptr;
+        	else
+            		tail = nullptr;
+        	delete temp;
+        	size--;
+        	return v;
 	}
 
 	void removeEnd() {
-		if (tail != nullptr) {
-			Node* temp = tail;
-			tail = tail->prev;
-			if (tail != nullptr)
-				tail->next = nullptr;
-			delete temp;
-			if (tail == nullptr)
-				head = nullptr;
-		}
+		Node* temp = tail;
+        	tail = tail->prev;
+        	if (tail != nullptr)
+            		tail->next = nullptr;
+        	else
+            		head = nullptr;
+        	delete temp;
+        	size--;
 	}
 
 	void insert(int pos, int v) {
-		Node* newNode = new Node;
-		newNode->val = v;
-
 		if (pos <= 0) {
-			addStart(v);
-			return;
-		}
+            		addStart(v);
+            		return;
+        	}
 
-		Node* current = head;
-		for (int i = 0; current != nullptr && i < pos - 1; ++i) {
-			current = current->next;
-		}
+        	if (pos >= size) {
+            		addEnd(v);
+            		return;
+        	}
 
-		if (current == nullptr) {
-			cout << "Position out of bounds.\n";
-			return;
-		}
+        	Node* current = head;
+        	for (int i = 0; current != nullptr && i < pos; ++i)
+            		current = current->next;
 
-		newNode->next = current->next;
-		newNode->prev = current;
-		if (current->next != nullptr)
-			current->next->prev = newNode;
-		current->next = newNode;
+        	if (current == nullptr)
+            		throw std::out_of_range("Position out of bounds");
 
-		if (newNode->next == nullptr)
-			tail = newNode;
+        	Node* newNode = new Node(v, current, current->prev);
+        	current->prev->next = newNode;
+        	current->prev = newNode;
+        	size++;
 	}
 
 	friend ostream& operator <<(ostream& s, const DoubleLinkedList& list) {
